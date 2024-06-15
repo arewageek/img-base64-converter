@@ -1,25 +1,19 @@
 import base64
 import random
 import string
+from urllib.request import urlopen
+import requests
 
-with open("images/arewa.jpg", "rb") as image:
-    data = image.read()
 
-print(data)
-print(type(data))
+imageURI = input("Paste the link to the image: ")
+imageExt = input("Input the desired file extension: ")
+# print(type(imageURI))
 
-encodedImage = str(base64.b64encode(data))
+# imageFile = urlopen(imageURI)
 
-print(encodedImage)
-print(type(encodedImage))
+# encodedImage = base64.b64encode(urlopen(imageFile).read())
 
-# in a situation where provided data is originally not in base64
-encodedImage = base64.b64encode(data).decode("utf-8")
-
-decodedImage = base64.b64decode(encodedImage)
-
-print(decodedImage)
-print(type(decodedImage))
+# decodedImage = base64.b64decode(encodedImage)
 
 def generateFileName (strLength) : 
     name = ''.join(random.choices(string.ascii_lowercase + string.digits, k = strLength))
@@ -27,5 +21,25 @@ def generateFileName (strLength) :
 
 fileName = generateFileName(7)
 
-with open(f"data/{fileName}.png", "wb") as file:
-    file.write(decodedImage)
+def encode_url_to_bytes(url):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 \
+            (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    }
+    return base64.b64encode(requests.get(url, headers=headers, timeout=120).content).decode("utf-8")
+
+
+def decode_to_image(f):
+    return base64.b64decode(f)
+
+convertedString = encode_url_to_bytes(imageURI)
+decodedImage = decode_to_image(convertedString)
+
+print(convertedString)
+print(type(convertedString))
+
+with open(f"data/{fileName}.{imageExt}", "wb") as f:
+    f.write(decodedImage)
+
+    print(":::::::::::::::::::::::::Download and conversion complete:::::::::::::::::::::::::")
